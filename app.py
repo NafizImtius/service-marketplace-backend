@@ -103,5 +103,45 @@ def add_provider():
     db.session.commit()
     return jsonify(new_provider.to_dict()), 201
 
+@app.route('/api/providers/<int:id>', methods=['DELETE'])
+def delete_provider(id):
+    provider = Provider.query.get(id)
+    
+    if provider is None:
+        return jsonify({'error': 'Provider not found'}), 404
+    
+    db.session.delete(provider)
+    db.session.commit()
+    
+    return jsonify({'message': 'Provider deleted successfully'}), 200
+
+
+@app.route('/api/providers/<int:id>', methods=['PUT'])
+def update_provider(id):
+    provider = Provider.query.get(id)
+    
+    if provider is None:
+        return jsonify({'error': 'Provider not found'}), 404
+    
+    data = request.json
+    
+    # Update fields if provided
+    if 'name' in data:
+        provider.name = data['name']
+    if 'category' in data:
+        provider.category = data['category']
+    if 'phone' in data:
+        provider.phone = data['phone']
+    if 'location' in data:
+        provider.location = data['location']
+    if 'rating' in data:
+        provider.rating = data['rating']
+    if 'priceRange' in data:
+        provider.priceRange = data['priceRange']
+    
+    db.session.commit()
+    
+    return jsonify(provider.to_dict()), 200
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
